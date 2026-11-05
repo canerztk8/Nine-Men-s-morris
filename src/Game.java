@@ -1,7 +1,7 @@
 public class Game {
 
     // GAME BOARD
-    private char[] board;;
+    private char[] board;
 
     // PLAYERS
     private char currentPlayer = 'W';
@@ -31,6 +31,14 @@ public class Game {
 
     public char getCurrentPlayer() { // Reads the current player, whose turn it is.
         return currentPlayer;
+    }
+
+    private char getOpponentPlayer() {  // Gets info about the opponent.
+        if (currentPlayer == 'W') {
+            return 'S';
+        } else {
+            return 'W';
+        }
     }
 
     public boolean mustRemoveStone() { // Checks if the current player must remove a stone.
@@ -70,12 +78,37 @@ public class Game {
         }
 
         // if the player in mills position he must remove a stone. else turn switches.
-        if(isInMill(position, currentPlayer)) {
+        if (isInMill(position, currentPlayer)) {
             mustRemoveStone = true;
         } else {
             switchPlayer();
         }
 
+        return true;
+
+    }
+
+    public boolean removeStone(int position) { // Removes the stone if the position is valid.
+
+        if (position < 0 || position >= board.length) {
+            return false;
+        }
+
+        if (!mustRemoveStone) {
+            return false;
+        }
+
+        if (board[position] != getOpponentPlayer()) {
+            return false;
+        }
+
+        if (isInMill(position, getOpponentPlayer()) && hasStoneOutsideMill(getOpponentPlayer())) {
+            return false;
+        }
+
+        board[position] = 'L';
+        mustRemoveStone = false;
+        switchPlayer();
         return true;
 
     }
@@ -99,6 +132,16 @@ public class Game {
                 if (isMill(mill[0], mill[1], mill[2], player)) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasStoneOutsideMill(char player) { // check if the player has stones outside of the mill
+
+        for (int i = 0; i < board.length; i++) {
+            if (board[i] == player && !isInMill(i, player)) {
+                return true;
             }
         }
         return false;

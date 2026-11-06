@@ -24,6 +24,33 @@ public class Game {
             { 16, 19, 22 }, { 8, 12, 17 }, { 5, 13, 20 }, { 2, 14, 23 }
     };
 
+    private final int neighbors[][] = { //Define the neighbours of points.
+        {1, 9}, {0, 2, 4}, {1, 14}, {4, 10}, {1, 3, 5, 7}, {4,13}, {7, 11}, {4, 6, 8}, {7, 12}, {0, 10, 21},  // as an Example, this ones from 0,1,2,3,4,5,6,7,8,9
+        {3, 9, 11, 18}, {6, 10, 15}, {8, 13, 17}, {5, 12, 14, 20}, {2, 13, 23}, //from 10 to 14
+        {11, 16}, {15, 17, 19}, {12, 16}, //15 to 17
+        {10, 19}, {16, 18, 20, 22}, {13, 19}, // 18 to 20
+        {9, 22}, {19, 21, 23}, {14, 22} //21 to 23
+    };
+
+    public boolean isNeighbor(int from, int to){
+        for(int nachbarn : neighbors[from]){
+            if(nachbarn == to){
+                return true;
+            }
+        }
+         return false;
+    }
+
+    public int countStonesOnBoard (char player){
+        int count = 0;
+        for (int i = 0; i < board.length; i++ ){
+           if( board[i] == player);{
+             count++;
+             }
+        }
+        return count;
+    }
+
     public char getStoneAt(int position) { // Reads the stone at the given position on the board.
         return board[position];
 

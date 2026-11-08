@@ -1,15 +1,25 @@
+import java.util.Random; // For selecting the start player Random.
+
 public class Game {
 
     // GAME BOARD
     private char[] board;
 
     // PLAYERS
-    private char currentPlayer = 'W';
+    Random random = new Random();
+    private char currentPlayer; // it will be selected randomly.
     private int whiteStonesToPlace = 9;
     private int blackStonesToPlace = 9;
     private boolean mustRemoveStone = false; // After the Mill, that shows if the player must remove a Stone.
 
     public Game() { // Game Board
+
+        if (random.nextBoolean()) { // Random Starting player selection.
+            currentPlayer = 'W';
+        } else {
+            currentPlayer = 'S';
+        }
+
         board = new char[24];
         for (int i = 0; i < board.length; i++) {
             board[i] = 'L';
@@ -71,6 +81,10 @@ public class Game {
 
     public boolean moveStone(int from, int to) { // Moves a stone if both player have 0 stones left and no mills formed.
 
+        if (winner == 'W' || winner == 'S') {
+            return false;
+        }
+
         if (from < 0 || from >= 24 || to < 0 || to >= 24 || from == to || mustRemoveStone == true) {
             return false;
         }
@@ -79,7 +93,8 @@ public class Game {
             return false;
         }
 
-        if (countStonesOnBoard(currentPlayer) > 3) { // If the player has more than 3 stones, he can only move to a neighboring position.
+        if (countStonesOnBoard(currentPlayer) > 3) { // If the player has more than 3 stones, he can only move to a
+                                                     // neighboring position.
 
             if (!isNeighbor(from, to)) {
                 return false;
@@ -105,6 +120,10 @@ public class Game {
     }
 
     public boolean placeStone(int position) { // Place the stone if the position is valid.
+
+        if (winner == 'W' || winner == 'S') {
+            return false;
+        }
 
         if (position < 0 || position >= board.length) {
             return false;
@@ -149,6 +168,10 @@ public class Game {
 
     public boolean removeStone(int position) { // Removes the stone if the position is valid.
 
+        if (winner == 'W' || winner == 'S') {
+            return false;
+        }
+
         if (position < 0 || position >= board.length) {
             return false;
         }
@@ -167,7 +190,13 @@ public class Game {
 
         board[position] = 'L';
         mustRemoveStone = false;
-        switchPlayer();
+
+        if (whiteStonesToPlace == 0 && blackStonesToPlace == 0 && countStonesOnBoard(getOpponentPlayer()) < 3) {
+            winner = currentPlayer;
+        } else {
+            switchPlayer();
+        }
+
         return true;
 
     }
@@ -178,6 +207,21 @@ public class Game {
         } else {
             currentPlayer = 'W';
         }
+
+        if (whiteStonesToPlace == 0 && blackStonesToPlace == 0 && hasValidMove(currentPlayer) == false) { // checkks if
+                                                                                                          // the game
+                                                                                                          // ended.
+            winner = getOpponentPlayer();
+        }
+
+    }
+
+    // Checks if the players are still placing their stones.
+    public boolean isPlacementPhase() {
+        if (whiteStonesToPlace == 0 && blackStonesToPlace == 0) {
+            return false;
+        }
+        return true;
     }
 
     // Checks if there is a mill formed by a player.
@@ -201,6 +245,42 @@ public class Game {
         for (int i = 0; i < board.length; i++) {
             if (board[i] == player && !isInMill(i, player)) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    // Winner check
+    private char winner = 'L'; // L means no winner yet,
+
+    public char getWinner() {
+        return winner;
+    }
+
+    public boolean hasValidMove(char player) { // Checks if the current player has a valid move.
+
+        if (countStonesOnBoard(player) < 3) {
+            return false;
+        }
+
+        if (countStonesOnBoard(player) == 3) {
+            for (int i = 0; i < board.length; i++) {
+                if (board[i] == 'L') {
+                    return true;
+                }
+
+            }
+            return false;
+        }
+
+        for (int i = 0; i < board.length; i++) {
+            if (board[i] == player) {
+                for (int neighbor : neighbors[i]) {
+                    if (board[neighbor] == 'L') {
+                        return true;
+                    }
+
+                }
             }
         }
         return false;
